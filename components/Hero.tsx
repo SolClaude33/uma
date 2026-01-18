@@ -164,6 +164,20 @@ export default function Hero() {
                 Learn More
               </button>
             </motion.div>
+
+            {/* Contract Address Box */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.8 }}
+              className="mt-8 flex justify-center"
+            >
+              <div className="content-box max-w-md mx-auto">
+                <p className="text-center" style={{ fontFamily: 'Arial, sans-serif', color: '#4a4a4a' }}>
+                  <strong>CA:</strong> soon
+                </p>
+              </div>
+            </motion.div>
           </motion.div>
         </div>
       </div>
