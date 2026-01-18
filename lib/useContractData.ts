@@ -139,13 +139,17 @@ export function useContractData(): DashboardData {
             const feesInBNB = formatEther(totalMarketingAll);
             const liquidityInBNB = formatEther(totalLiquidityAll);
 
+            // Calcular caballos ayudados: cada 1 BNB = 1 caballo
+            const horsesHelpedCount = totalMarketingAll / BigInt(10 ** 18); // 1 BNB = 1e18 wei
+            const horsesHelpedStr = horsesHelpedCount.toString();
+
             const formattedFees = parseFloat(feesInBNB).toFixed(2);
             const formattedLiquidity = parseFloat(liquidityInBNB).toFixed(2);
 
             setData({
               totalFeesCollected: formattedFees,
               liquidityAdded: formattedLiquidity,
-              horsesHelped: "-",
+              horsesHelped: horsesHelpedStr,
               isLoading: false,
               error: null,
             });
@@ -176,13 +180,17 @@ export function useContractData(): DashboardData {
             const feesInBNB = formatEther(totalFeesForHorses);
             const liquidityInBNB = formatEther(totalFeesForLiquidity);
 
+            // Calcular caballos ayudados: cada 1 BNB = 1 caballo
+            const horsesHelpedCount = totalFeesForHorses / BigInt(10 ** 18); // 1 BNB = 1e18 wei
+            const horsesHelpedStr = horsesHelpedCount.toString();
+
             const formattedFees = parseFloat(feesInBNB).toFixed(2);
             const formattedLiquidity = parseFloat(liquidityInBNB).toFixed(2);
 
             setData({
               totalFeesCollected: formattedFees,
               liquidityAdded: formattedLiquidity,
-              horsesHelped: "-",
+              horsesHelped: horsesHelpedStr,
               isLoading: false,
               error: null,
             });
@@ -322,6 +330,10 @@ export function useContractData(): DashboardData {
           const feesInBNB = formatEther(totalFeesForHorses);
           const liquidityInBNB = formatEther(totalFeesForLiquidity);
 
+          // Calcular caballos ayudados: cada 1 BNB = 1 caballo
+          const horsesHelpedCount = totalFeesForHorses / BigInt(10 ** 18); // 1 BNB = 1e18 wei
+          const horsesHelpedStr = horsesHelpedCount.toString();
+
           // Formatear a 2 decimales
           const formattedFees = parseFloat(feesInBNB).toFixed(2);
           const formattedLiquidity = parseFloat(liquidityInBNB).toFixed(2);
@@ -329,7 +341,7 @@ export function useContractData(): DashboardData {
           setData({
             totalFeesCollected: formattedFees,
             liquidityAdded: formattedLiquidity,
-            horsesHelped: "-", // TODO: Implementar lógica para calcular/leer esto
+            horsesHelped: horsesHelpedStr,
             isLoading: false,
             error: null,
           });
@@ -344,13 +356,18 @@ export function useContractData(): DashboardData {
           
           const feesInBNB = formatEther(estimatedFeesForHorses);
           const liquidityInBNB = formatEther(estimatedFeesForLiquidity);
+          
+          // Calcular caballos ayudados: cada 1 BNB = 1 caballo
+          const horsesHelpedCount = estimatedFeesForHorses / BigInt(10 ** 18); // 1 BNB = 1e18 wei
+          const horsesHelpedStr = horsesHelpedCount.toString();
+          
           const formattedFees = parseFloat(feesInBNB).toFixed(2);
           const formattedLiquidity = parseFloat(liquidityInBNB).toFixed(2);
           
           setData({
             totalFeesCollected: formattedFees,
             liquidityAdded: formattedLiquidity,
-            horsesHelped: "-",
+            horsesHelped: horsesHelpedStr,
             isLoading: false,
             error: `Error leyendo eventos: ${eventsError instanceof Error ? eventsError.message : "Error desconocido"}. Mostrando estimación.`,
           });
