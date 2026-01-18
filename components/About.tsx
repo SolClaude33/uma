@@ -34,7 +34,6 @@ export default function About() {
           quality={90}
           sizes="100vw"
           loading="eager"
-          sizes="100vw"
         />
       </div>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-24 pb-24">
