@@ -40,8 +40,8 @@ const config: Config = {
           "100%": { backgroundPosition: "200px 0" },
         },
         sparkle: {
-          "0%, 100%": { opacity: 0, transform: "scale(0)" },
-          "50%": { opacity: 1, transform: "scale(1)" },
+          "0%, 100%": { opacity: "0", transform: "scale(0)" },
+          "50%": { opacity: "1", transform: "scale(1)" },
         },
         float: {
           "0%, 100%": { transform: "translateY(0px)" },
