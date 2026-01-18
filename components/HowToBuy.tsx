@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FaCoins,
   FaHeart,
@@ -60,6 +60,16 @@ export default function HowToBuy() {
   const prevSlide = () => {
     setCurrentIndex((prev) => (prev - 1 + steps.length) % steps.length);
   };
+
+  // Pre-cargar todas las imágenes del carrusel al montar el componente
+  useEffect(() => {
+    steps.forEach((step) => {
+      if (step.image) {
+        const img = new window.Image();
+        img.src = step.image;
+      }
+    });
+  }, []);
 
   return (
     <section id="how-is-working" className="pt-2 pb-24 relative w-full flex items-center overflow-hidden" style={{ minHeight: '100vh' }}>
@@ -140,7 +150,9 @@ export default function HowToBuy() {
                         fill
                         className="object-contain"
                         quality={90}
-                        sizes="480px"
+                        sizes="576px"
+                        priority={index === 0}
+                        loading="eager"
                       />
                     </div>
                   </motion.div>
