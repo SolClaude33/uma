@@ -21,6 +21,7 @@ export interface Translations {
   about: {
     title: string;
     description: string;
+    paragraphs?: string[];
   };
   
   // How is working Section
