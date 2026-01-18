@@ -3,12 +3,11 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { FaCoins, FaChartLine, FaHeart } from "react-icons/fa";
+import { useContractData } from "@/lib/useContractData";
 
 export default function FullscreenImage() {
-  // Placeholder data - estos valores se conectarán a una API después
-  const totalFeesCollected = "0.00"; // BNB
-  const liquidityAdded = "0.00"; // BNB
-  const horsesHelped = "-"; // Se definirá después
+  // Leer datos del contrato en tiempo real
+  const { totalFeesCollected, liquidityAdded, horsesHelped, isLoading, error } = useContractData();
 
   return (
     <section id="dashboard" className="relative w-full flex items-center justify-center overflow-hidden">

@@ -102,7 +102,7 @@ export default function Hero() {
                 letterSpacing: '0.05em'
               }}
             >
-              Let's run to save the horses!
+              Let&apos;s run to save the horses!
             </motion.p>
 
             <motion.div
