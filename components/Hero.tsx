@@ -172,7 +172,7 @@ export default function Hero() {
               transition={{ delay: 0.8, duration: 0.8 }}
               className="mt-8 flex justify-center"
             >
-              <div className="content-box max-w-md mx-auto">
+              <div className="content-box max-w-md mx-auto" style={{ paddingTop: '1rem', paddingBottom: '1rem' }}>
                 <p className="text-center" style={{ fontFamily: 'Arial, sans-serif', color: '#4a4a4a' }}>
                   <strong>CA:</strong> soon
                 </p>
