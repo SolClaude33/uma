@@ -83,6 +83,10 @@ export function useContractData(): DashboardData {
         const blocksPerYear = 20_000_000n;
         const startBlock = currentBlock > blocksPerYear ? currentBlock - blocksPerYear : 0n;
         
+        // IMPORTANTE: El RPC tiene un límite de 1000 bloques por solicitud
+        // Necesitamos dividir la lectura en lotes de máximo 1000 bloques
+        const maxBlocksPerRequest = 1000n;
+        
         console.log(`📊 Dashboard - Buscando eventos desde bloque ${startBlock.toString()} hasta ${currentBlock.toString()}`);
         
         try {
@@ -90,13 +94,38 @@ export function useContractData(): DashboardData {
           // topic[1] en eventos TokenBought/TokenSold es el token address (indexed)
           const tokenAddressTopic = `0x${TOKEN_ADDRESS.slice(2).toLowerCase().padStart(64, '0')}`;
           
-          // Leer todos los logs del contrato Portal de Flap
-          // Luego filtraremos por topic[1] = token address antes de decodificar
-          const allLogs = await publicClient.getLogs({
-            address: FLAP_PORTAL_ADDRESS as `0x${string}`,
-            fromBlock: startBlock,
-            toBlock: currentBlock,
-          });
+          // Leer logs en lotes de máximo 1000 bloques
+          const allLogs: any[] = [];
+          let fromBlock = startBlock;
+          
+          console.log(`📦 Dashboard - Leyendo eventos en lotes de ${maxBlocksPerRequest.toString()} bloques...`);
+          
+          while (fromBlock < currentBlock) {
+            const toBlock = fromBlock + maxBlocksPerRequest > currentBlock 
+              ? currentBlock 
+              : fromBlock + maxBlocksPerRequest - 1n;
+            
+            try {
+              const batchLogs = await publicClient.getLogs({
+                address: FLAP_PORTAL_ADDRESS as `0x${string}`,
+                fromBlock: fromBlock,
+                toBlock: toBlock,
+              });
+              
+              allLogs.push(...batchLogs);
+              
+              console.log(`   ✓ Bloque ${fromBlock.toString()} - ${toBlock.toString()}: ${batchLogs.length} logs encontrados`);
+              
+              fromBlock = toBlock + 1n;
+              
+              // Pequeña pausa entre lotes para evitar rate limiting
+              await new Promise(resolve => setTimeout(resolve, 100));
+            } catch (batchError) {
+              console.error(`⚠️ Error en lote ${fromBlock.toString()}-${toBlock.toString()}:`, batchError);
+              // Continuar con el siguiente lote
+              fromBlock = toBlock + 1n;
+            }
+          }
           
           console.log(`📊 Dashboard - Total logs encontrados: ${allLogs.length}`);
           
