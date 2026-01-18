@@ -9,9 +9,9 @@ export const metadata: Metadata = {
   title: "Save a Uma",
   description: "Let's run to save the horses!",
   icons: {
-    icon: '/Uma_Musume_Pretty_Derby_JP_Logo.webp',
-    shortcut: '/Uma_Musume_Pretty_Derby_JP_Logo.webp',
-    apple: '/Uma_Musume_Pretty_Derby_JP_Logo.webp',
+    icon: '/logoumamusime.png',
+    shortcut: '/logoumamusime.png',
+    apple: '/logoumamusime.png',
   },
   openGraph: {
     title: "Save a Uma",
