@@ -21,6 +21,7 @@ export default function FullscreenImage() {
           priority
           quality={90}
           sizes="100vw"
+          loading="eager"
         />
       </div>
       

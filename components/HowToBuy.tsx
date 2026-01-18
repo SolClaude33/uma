@@ -88,6 +88,7 @@ export default function HowToBuy() {
           priority
           quality={90}
           sizes="100vw"
+          loading="eager"
           style={{ objectPosition: 'center top' }}
         />
       </div>

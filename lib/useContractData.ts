@@ -28,6 +28,12 @@ export function useContractData(): DashboardData {
   useEffect(() => {
     async function fetchContractData() {
       try {
+        // Log para debugging
+        console.log("🔍 Dashboard - Configuración:", {
+          FLAP_PORTAL_ADDRESS,
+          TOKEN_ADDRESS,
+        });
+
         // Crear cliente público para leer del contrato (BSC Mainnet)
         const publicClient: PublicClient = createPublicClient({
           chain: CHAIN,
@@ -37,16 +43,18 @@ export function useContractData(): DashboardData {
         // Leer el estado del token desde el contrato Portal de Flap usando getTokenV7
         if (!FLAP_PORTAL_ADDRESS || FLAP_PORTAL_ADDRESS === "0x0000000000000000000000000000000000000000" ||
             !TOKEN_ADDRESS || TOKEN_ADDRESS === "0x0000000000000000000000000000000000000000") {
+          console.warn("⚠️ Dashboard - Direcciones de contrato no configuradas");
           setData({
             totalFeesCollected: "0.00",
             liquidityAdded: "0.00",
             horsesHelped: "-",
             isLoading: false,
-            error: "Direcciones de contrato no configuradas",
+            error: "Direcciones de contrato no configuradas. Verifica NEXT_PUBLIC_CONTRACT_ADDRESS en Vercel.",
           });
           return;
         }
 
+        console.log("📡 Dashboard - Leyendo datos del contrato Flap...");
         const tokenState = await publicClient.readContract({
           address: FLAP_PORTAL_ADDRESS as `0x${string}`,
           abi: FLAP_PORTAL_ABI,
@@ -59,6 +67,13 @@ export function useContractData(): DashboardData {
           taxRate: bigint;
           progress: bigint;
         };
+
+        console.log("✅ Dashboard - Datos recibidos:", {
+          reserve: tokenState.reserve.toString(),
+          circulatingSupply: tokenState.circulatingSupply.toString(),
+          price: tokenState.price.toString(),
+          taxRate: tokenState.taxRate.toString(),
+        });
 
         // El reserve es la liquidez en el bonding curve (en BNB)
         const liquidity = tokenState.reserve || 0n;
@@ -84,13 +99,20 @@ export function useContractData(): DashboardData {
           error: null,
         });
       } catch (error) {
-        console.error("Error leyendo datos del contrato Flap:", error);
+        console.error("❌ Dashboard - Error leyendo datos del contrato Flap:", error);
+        
+        // Log detallado del error
+        if (error instanceof Error) {
+          console.error("Error message:", error.message);
+          console.error("Error stack:", error.stack);
+        }
+        
         setData({
           totalFeesCollected: "0.00",
           liquidityAdded: "0.00",
           horsesHelped: "-",
           isLoading: false,
-          error: error instanceof Error ? error.message : "Error desconocido",
+          error: error instanceof Error ? `Error: ${error.message}` : "Error desconocido al leer del contrato",
         });
       }
     }
