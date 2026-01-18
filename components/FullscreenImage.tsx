@@ -79,20 +79,20 @@ export default function FullscreenImage() {
             </h2>
           </div>
           
-          <div className="space-y-4">
-            {/* Total Fees Collected */}
-            <div className="flex items-center justify-between p-4" style={{ 
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '3px solid #ffffff',
-              borderRadius: '4px',
-              boxShadow: '0 0 15px rgba(255, 255, 255, 0.4)'
-            }}>
-              <div className="flex items-center gap-3">
-                <FaCoins className="text-2xl" style={{ color: '#ffffff' }} />
-                <p className="text-base uppercase tracking-wider" style={{ color: '#ffffff', opacity: 0.9, fontWeight: '700' }}>
-                  Total Fees
-                </p>
-              </div>
+              <div className="space-y-4">
+                {/* Donations */}
+                <div className="flex items-center justify-between p-4" style={{ 
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '3px solid #ffffff',
+                  borderRadius: '4px',
+                  boxShadow: '0 0 15px rgba(255, 255, 255, 0.4)'
+                }}>
+                  <div className="flex items-center gap-3">
+                    <FaCoins className="text-2xl" style={{ color: '#ffffff' }} />
+                    <p className="text-base uppercase tracking-wider" style={{ color: '#ffffff', opacity: 0.9, fontWeight: '700' }}>
+                      Donations
+                    </p>
+                  </div>
               <div className="text-right">
                 <p className="text-3xl font-mono" style={{ 
                   color: '#ffffff',
