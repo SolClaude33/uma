@@ -2,20 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { createPublicClient, http, formatEther, PublicClient } from "viem";
-import { bsc, mainnet } from "viem/chains";
-import { CONTRACT_ADDRESS, CONTRACT_ABI, CHAIN_ID } from "./contract";
+import { bsc } from "viem/chains";
+import { FLAP_PORTAL_ADDRESS, FLAP_PORTAL_ABI, TOKEN_ADDRESS } from "./flapContract";
 
-// Configurar el cliente público según la red
-const getChain = () => {
-  switch (CHAIN_ID) {
-    case "56":
-      return bsc;
-    case "1":
-      return mainnet;
-    default:
-      return bsc;
-  }
-};
+// BSC Mainnet - fixed chain
+const CHAIN = bsc;
 
 export interface DashboardData {
   totalFeesCollected: string;
@@ -37,59 +28,48 @@ export function useContractData(): DashboardData {
   useEffect(() => {
     async function fetchContractData() {
       try {
-        // Crear cliente público para leer del contrato
+        // Crear cliente público para leer del contrato (BSC Mainnet)
         const publicClient: PublicClient = createPublicClient({
-          chain: getChain(),
+          chain: CHAIN,
           transport: http(),
         });
 
-        // Intentar leer las funciones/variables del contrato
-        // Ajusta estos nombres según tu contrato real
-        let totalFees = 0n;
-        let liquidity = 0n;
-
-        try {
-          // Intento 1: Leer como función
-          totalFees = (await publicClient.readContract({
-            address: CONTRACT_ADDRESS as `0x${string}`,
-            abi: CONTRACT_ABI,
-            functionName: "totalFeesCollected",
-          })) as bigint;
-        } catch (e) {
-          try {
-            // Intento 2: Leer como variable pública "totalFees"
-            totalFees = (await publicClient.readContract({
-              address: CONTRACT_ADDRESS as `0x${string}`,
-              abi: CONTRACT_ABI,
-              functionName: "totalFees",
-            })) as bigint;
-          } catch (e2) {
-            console.warn("No se pudo leer totalFees del contrato:", e2);
-          }
+        // Leer el estado del token desde el contrato Portal de Flap usando getTokenV7
+        if (!FLAP_PORTAL_ADDRESS || FLAP_PORTAL_ADDRESS === "0x0000000000000000000000000000000000000000" ||
+            !TOKEN_ADDRESS || TOKEN_ADDRESS === "0x0000000000000000000000000000000000000000") {
+          setData({
+            totalFeesCollected: "0.00",
+            liquidityAdded: "0.00",
+            horsesHelped: "-",
+            isLoading: false,
+            error: "Direcciones de contrato no configuradas",
+          });
+          return;
         }
 
-        try {
-          // Intento 1: Leer como función
-          liquidity = (await publicClient.readContract({
-            address: CONTRACT_ADDRESS as `0x${string}`,
-            abi: CONTRACT_ABI,
-            functionName: "liquidityAdded",
-          })) as bigint;
-        } catch (e) {
-          try {
-            // Intento 2: Leer como variable pública "totalLiquidity"
-            liquidity = (await publicClient.readContract({
-              address: CONTRACT_ADDRESS as `0x${string}`,
-              abi: CONTRACT_ABI,
-              functionName: "totalLiquidity",
-            })) as bigint;
-          } catch (e2) {
-            console.warn("No se pudo leer liquidity del contrato:", e2);
-          }
-        }
+        const tokenState = await publicClient.readContract({
+          address: FLAP_PORTAL_ADDRESS as `0x${string}`,
+          abi: FLAP_PORTAL_ABI,
+          functionName: "getTokenV7",
+          args: [TOKEN_ADDRESS as `0x${string}`],
+        }) as {
+          reserve: bigint;
+          circulatingSupply: bigint;
+          price: bigint;
+          taxRate: bigint;
+          progress: bigint;
+        };
 
-        // Convertir de Wei a BNB/ETH
-        const feesInBNB = formatEther(totalFees);
+        // El reserve es la liquidez en el bonding curve (en BNB)
+        const liquidity = tokenState.reserve || 0n;
+
+        // Para fees: calcular basándose en progress o usar taxRate
+        // Por ahora usamos una aproximación: reserve * 0.03 (3% fee estimado)
+        // TODO: Calcular fees reales desde eventos TokenBought/TokenSold
+        const estimatedFees = (liquidity * 3n) / 100n; // 3% estimate
+
+        // Convertir de Wei a BNB
+        const feesInBNB = formatEther(estimatedFees);
         const liquidityInBNB = formatEther(liquidity);
 
         // Formatear a 2 decimales
@@ -104,7 +84,7 @@ export function useContractData(): DashboardData {
           error: null,
         });
       } catch (error) {
-        console.error("Error leyendo datos del contrato:", error);
+        console.error("Error leyendo datos del contrato Flap:", error);
         setData({
           totalFeesCollected: "0.00",
           liquidityAdded: "0.00",
@@ -115,22 +95,11 @@ export function useContractData(): DashboardData {
       }
     }
 
-    // Solo intentar leer si la dirección del contrato es válida
-    if (CONTRACT_ADDRESS && CONTRACT_ADDRESS !== "0x0000000000000000000000000000000000000000") {
-      fetchContractData();
+    fetchContractData();
 
-      // Actualizar cada 30 segundos
-      const interval = setInterval(fetchContractData, 30000);
-      return () => clearInterval(interval);
-    } else {
-      setData({
-        totalFeesCollected: "0.00",
-        liquidityAdded: "0.00",
-        horsesHelped: "-",
-        isLoading: false,
-        error: "Dirección del contrato no configurada",
-      });
-    }
+    // Actualizar cada 30 segundos
+    const interval = setInterval(fetchContractData, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   return data;

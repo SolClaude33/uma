@@ -1,6 +1,6 @@
-// Contract configuration
+// Contract configuration - BSC Mainnet only
 export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "0x0000000000000000000000000000000000000000";
-export const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID || "56"; // 56 = BSC, 1 = Ethereum
+export const CHAIN_ID = "56"; // BSC Mainnet - fixed
 
 // BSC Mainnet RPC
 export const BSC_RPC_URL = "https://bsc-dataseed.binance.org/";
