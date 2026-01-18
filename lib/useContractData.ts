@@ -376,8 +376,8 @@ export function useContractData(): DashboardData {
 
     fetchContractData();
 
-    // Actualizar cada 30 segundos
-    const interval = setInterval(fetchContractData, 30000);
+        // Actualizar cada 1 minuto (60 segundos)
+        const interval = setInterval(fetchContractData, 60000);
     return () => clearInterval(interval);
   }, []);
 
