@@ -185,3 +185,126 @@ export const FLAP_PORTAL_ADDRESS = process.env.NEXT_PUBLIC_FLAP_PORTAL_ADDRESS |
 
 // Your token address created on Flap
 export const TOKEN_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "0x0000000000000000000000000000000000000000";
+
+// Token Contract ABI - Partial ABI for reading taxProcessor
+export const TOKEN_ABI = [
+  {
+    "type": "function",
+    "name": "taxProcessor",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  }
+] as const;
+
+// Dividend Contract ABI - Partial ABI for reading totalDividendsDistributed
+export const DIVIDEND_ABI = [
+  {
+    "type": "function",
+    "name": "totalDividendsDistributed",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  }
+] as const;
+
+// Dividend contract address (optional - if provided, will read from here instead of events)
+export const DIVIDEND_ADDRESS = process.env.NEXT_PUBLIC_DIVIDEND_ADDRESS || null;
+
+// TaxProcessor Contract ABI - Partial ABI for reading accumulated totals
+export const TAX_PROCESSOR_ABI = [
+  {
+    "type": "function",
+    "name": "totalQuoteSentToDividend",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "totalQuoteAddedToLiquidity",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "totalQuoteSentToMarketing",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "dividendQuoteBalance",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "lpQuoteBalance",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "marketQuoteBalance",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  }
+] as const;
+
+// TaxProcessor contract address (optional - if provided, will read from here instead of events)
+// This can be obtained from the token contract's taxProcessor() function
+export const TAX_PROCESSOR_ADDRESS = process.env.NEXT_PUBLIC_TAX_PROCESSOR_ADDRESS || null;

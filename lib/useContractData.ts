@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPublicClient, http, formatEther, PublicClient, decodeEventLog } from "viem";
 import { bsc } from "viem/chains";
-import { FLAP_PORTAL_ADDRESS, FLAP_PORTAL_ABI, TOKEN_ADDRESS } from "./flapContract";
+import { FLAP_PORTAL_ADDRESS, FLAP_PORTAL_ABI, TOKEN_ADDRESS, DIVIDEND_ADDRESS, DIVIDEND_ABI, TAX_PROCESSOR_ADDRESS, TAX_PROCESSOR_ABI, TOKEN_ABI } from "./flapContract";
 
 // BSC Mainnet - fixed chain
 const CHAIN = bsc;
@@ -70,7 +70,131 @@ export function useContractData(): DashboardData {
         
         let liquidity = reserve || 0n;
 
-        // Leer eventos históricos para calcular fees acumuladas
+        // Obtener dirección del TaxProcessor desde el token (automático)
+        let taxProcessorAddress: string | null = null;
+        try {
+          taxProcessorAddress = await publicClient.readContract({
+            address: TOKEN_ADDRESS as `0x${string}`,
+            abi: TOKEN_ABI,
+            functionName: "taxProcessor",
+          }) as string;
+          
+          if (taxProcessorAddress && taxProcessorAddress !== "0x0000000000000000000000000000000000000000") {
+            console.log(`🔗 Dashboard - TaxProcessor obtenido desde token: ${taxProcessorAddress}`);
+          } else {
+            console.log("⚠️ Dashboard - Token no tiene taxProcessor configurado");
+            // Usar dirección de variable de entorno como fallback
+            taxProcessorAddress = TAX_PROCESSOR_ADDRESS;
+          }
+        } catch (tokenError) {
+          console.warn("⚠️ Dashboard - No se pudo leer taxProcessor desde token:", tokenError);
+          // Usar dirección de variable de entorno como fallback
+          taxProcessorAddress = TAX_PROCESSOR_ADDRESS;
+        }
+
+        // INTENTAR LEER DESDE CONTRATO TAX_PROCESSOR (más eficiente y preciso)
+        if (taxProcessorAddress && taxProcessorAddress !== "0x0000000000000000000000000000000000000000") {
+          try {
+            console.log("💰 Dashboard - Intentando leer desde contrato TaxProcessor...");
+            
+            // Leer todos los totales acumulados del TaxProcessor
+            const [totalLiquidityAdded, totalMarketingSent, pendingLiquidity, pendingMarketing] = await Promise.all([
+              publicClient.readContract({
+                address: taxProcessorAddress as `0x${string}`,
+                abi: TAX_PROCESSOR_ABI,
+                functionName: "totalQuoteAddedToLiquidity",
+              }) as Promise<bigint>,
+              publicClient.readContract({
+                address: taxProcessorAddress as `0x${string}`,
+                abi: TAX_PROCESSOR_ABI,
+                functionName: "totalQuoteSentToMarketing",
+              }) as Promise<bigint>,
+              publicClient.readContract({
+                address: taxProcessorAddress as `0x${string}`,
+                abi: TAX_PROCESSOR_ABI,
+                functionName: "lpQuoteBalance",
+              }) as Promise<bigint>,
+              publicClient.readContract({
+                address: taxProcessorAddress as `0x${string}`,
+                abi: TAX_PROCESSOR_ABI,
+                functionName: "marketQuoteBalance",
+              }) as Promise<bigint>,
+            ]);
+
+            // Total de fees distribuidas + pendientes
+            // marketQuoteBalance + totalQuoteSentToMarketing = total para donaciones (Marketing)
+            // lpQuoteBalance + totalQuoteAddedToLiquidity = total para liquidez (Liquidity)
+            const totalMarketingAll = totalMarketingSent + pendingMarketing;
+            const totalLiquidityAll = totalLiquidityAdded + pendingLiquidity;
+
+            console.log(`✅ Dashboard - Total desde TaxProcessor:`);
+            console.log(`   - Marketing (distribuido): ${formatEther(totalMarketingSent)} BNB`);
+            console.log(`   - Marketing (pendiente): ${formatEther(pendingMarketing)} BNB`);
+            console.log(`   - Liquidity (distribuido): ${formatEther(totalLiquidityAdded)} BNB`);
+            console.log(`   - Liquidity (pendiente): ${formatEther(pendingLiquidity)} BNB`);
+            console.log(`   - Total Marketing (Donations): ${formatEther(totalMarketingAll)} BNB`);
+            console.log(`   - Total Liquidity: ${formatEther(totalLiquidityAll)} BNB`);
+
+            // Usar marketing para Donations y liquidity para Liquidity
+            const feesInBNB = formatEther(totalMarketingAll);
+            const liquidityInBNB = formatEther(totalLiquidityAll);
+
+            const formattedFees = parseFloat(feesInBNB).toFixed(2);
+            const formattedLiquidity = parseFloat(liquidityInBNB).toFixed(2);
+
+            setData({
+              totalFeesCollected: formattedFees,
+              liquidityAdded: formattedLiquidity,
+              horsesHelped: "-",
+              isLoading: false,
+              error: null,
+            });
+
+            return; // Salir temprano si se leyó exitosamente desde TaxProcessor
+          } catch (taxProcessorError) {
+            console.warn("⚠️ Dashboard - No se pudo leer desde TaxProcessor, intentando Dividend:", taxProcessorError);
+            // Intentar Dividend como fallback
+          }
+        }
+
+        // INTENTAR LEER DESDE CONTRATO DIVIDEND (fallback)
+        if (DIVIDEND_ADDRESS && DIVIDEND_ADDRESS !== "0x0000000000000000000000000000000000000000") {
+          try {
+            console.log("💰 Dashboard - Intentando leer desde contrato Dividend...");
+            const totalDividendsDistributed = await publicClient.readContract({
+              address: DIVIDEND_ADDRESS as `0x${string}`,
+              abi: DIVIDEND_ABI,
+              functionName: "totalDividendsDistributed",
+            }) as bigint;
+
+            console.log(`✅ Dashboard - Total dividendos desde contrato Dividend: ${formatEther(totalDividendsDistributed)} BNB`);
+
+            // Distribución 70/30
+            const totalFeesForHorses = (totalDividendsDistributed * 70n) / 100n;
+            const totalFeesForLiquidity = (totalDividendsDistributed * 30n) / 100n;
+
+            const feesInBNB = formatEther(totalFeesForHorses);
+            const liquidityInBNB = formatEther(totalFeesForLiquidity);
+
+            const formattedFees = parseFloat(feesInBNB).toFixed(2);
+            const formattedLiquidity = parseFloat(liquidityInBNB).toFixed(2);
+
+            setData({
+              totalFeesCollected: formattedFees,
+              liquidityAdded: formattedLiquidity,
+              horsesHelped: "-",
+              isLoading: false,
+              error: null,
+            });
+
+            return; // Salir temprano si se leyó exitosamente desde Dividend
+          } catch (dividendError) {
+            console.warn("⚠️ Dashboard - No se pudo leer desde Dividend, usando eventos:", dividendError);
+            // Continuar con lectura de eventos como fallback
+          }
+        }
+
+        // Leer eventos históricos para calcular fees acumuladas (fallback)
         console.log("📜 Dashboard - Leyendo eventos históricos para calcular fees...");
         
         // Obtener el bloque actual
