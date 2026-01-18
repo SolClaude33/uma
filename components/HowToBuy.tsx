@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   FaCoins,
   FaHeart,
@@ -11,47 +11,51 @@ import {
   FaChevronLeft,
   FaChevronRight,
 } from "react-icons/fa";
-
-const steps = [
-  {
-    icon: FaCoins,
-    title: "3% Transaction Fee",
-    description:
-      "Each transaction includes a 3% fee that supports the project and its mission.",
-    image: "/mambo.webp",
-  },
-  {
-    icon: FaHeart,
-    title: "Helping Real Horses",
-    description:
-      "By buying and holding the token, you are helping real horses. Part of what the token generates is used to support horse care and retirement.",
-    image: "/oguri.webp",
-  },
-  {
-    icon: FaChartLine,
-    title: "Growing Liquidity",
-    description:
-      "A portion of the fees is used to add liquidity over time, helping keep the token strong and sustainable.",
-    image: "/haruurara.webp",
-  },
-  {
-    icon: FaCheckCircle,
-    title: "Check the Data",
-    description: (
-      <>
-        All progress can be followed in our public dashboard, where you can see:<br /><br />
-        • Total fees collected<br />
-        • Funds added to token liquidity<br />
-        • How many horses have been helped<br /><br />
-        Everything in one place, easy to follow.
-      </>
-    ),
-    image: "/agnes.webp",
-  },
-];
+import { useLanguage } from "@/lib/LanguageContext";
 
 export default function HowToBuy() {
+  const { t } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const steps = useMemo(() => [
+    {
+      icon: FaCoins,
+      title: t.howIsWorking.steps.transactionFee.title,
+      description: t.howIsWorking.steps.transactionFee.description,
+      image: "/mambo.webp",
+    },
+    {
+      icon: FaHeart,
+      title: t.howIsWorking.steps.helpingHorses.title,
+      description: t.howIsWorking.steps.helpingHorses.description,
+      image: "/oguri.webp",
+    },
+    {
+      icon: FaChartLine,
+      title: t.howIsWorking.steps.growingLiquidity.title,
+      description: t.howIsWorking.steps.growingLiquidity.description,
+      image: "/haruurara.webp",
+    },
+    {
+      icon: FaCheckCircle,
+      title: t.howIsWorking.steps.checkData.title,
+      description: (
+        <>
+          {t.howIsWorking.steps.checkData.description.split('\n').map((line, idx, arr) => {
+            const trimmedLine = line.trim();
+            if (!trimmedLine) return <br key={idx} />;
+            return (
+              <span key={idx}>
+                {trimmedLine}
+                {idx < arr.length - 1 && <br />}
+              </span>
+            );
+          })}
+        </>
+      ),
+      image: "/agnes.webp",
+    },
+  ], [t]);
 
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % steps.length);
@@ -116,7 +120,7 @@ export default function HowToBuy() {
               letterSpacing: '0.05em'
             }}
           >
-            How is working
+            {t.howIsWorking.title}
           </h2>
         </motion.div>
 

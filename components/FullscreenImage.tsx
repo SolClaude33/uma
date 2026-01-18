@@ -4,8 +4,10 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { FaCoins, FaChartLine, FaHeart } from "react-icons/fa";
 import { useContractData } from "@/lib/useContractData";
+import { useLanguage } from "@/lib/LanguageContext";
 
 export default function FullscreenImage() {
+  const { t } = useLanguage();
   // Leer datos del contrato en tiempo real
   const { totalFeesCollected, liquidityAdded, horsesHelped, isLoading, error } = useContractData();
 
@@ -75,7 +77,7 @@ export default function FullscreenImage() {
               letterSpacing: '0.2em',
               fontFamily: 'monospace, "Courier New", sans-serif'
             }}>
-              DASHBOARD
+              {t.dashboard.title}
             </h2>
           </div>
           
@@ -90,7 +92,7 @@ export default function FullscreenImage() {
                   <div className="flex items-center gap-3">
                     <FaCoins className="text-2xl" style={{ color: '#ffffff' }} />
                     <p className="text-base uppercase tracking-wider" style={{ color: '#ffffff', opacity: 0.9, fontWeight: '700' }}>
-                      Donations
+                      {t.dashboard.donations}
                     </p>
                   </div>
               <div className="text-right">
@@ -117,7 +119,7 @@ export default function FullscreenImage() {
               <div className="flex items-center gap-3">
                 <FaChartLine className="text-2xl" style={{ color: '#ffffff' }} />
                 <p className="text-base uppercase tracking-wider" style={{ color: '#ffffff', opacity: 0.9, fontWeight: '700' }}>
-                  Liquidity
+                  {t.dashboard.liquidity}
                 </p>
               </div>
               <div className="text-right">
@@ -144,7 +146,7 @@ export default function FullscreenImage() {
               <div className="flex items-center gap-3">
                 <FaHeart className="text-2xl" style={{ color: '#ffffff' }} />
                 <p className="text-base uppercase tracking-wider" style={{ color: '#ffffff', opacity: 0.9, fontWeight: '700' }}>
-                  Horses Helped
+                  {t.dashboard.horsesHelped}
                 </p>
               </div>
               <div className="text-right">

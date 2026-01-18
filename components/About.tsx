@@ -3,8 +3,10 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
+import { useLanguage } from "@/lib/LanguageContext";
 
 export default function About() {
+  const { t } = useLanguage();
   const titleRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
@@ -61,35 +63,73 @@ export default function About() {
                     zIndex: 10
                   }}
                 >
-                  What is Uma Musume?
+                  {t.about.title}
                 </motion.h2>
               </div>
               <div className="content-box space-y-8 leading-relaxed relative text-[1.40625rem] md:text-[1.5625rem] lg:text-[1.875rem]" style={{ fontFamily: 'Arial, sans-serif', color: '#4a4a4a', zIndex: 1 }}>
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.4, duration: 0.8 }}
-                >
-                  <strong>Uma Musume: Pretty Derby</strong> is a Japanese anime and game franchise by Cygames that turns legendary real-life racehorses into &quot;horse girls&quot; who train, race, and chase their dreams while honoring the history behind each horse.
-                </motion.p>
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.6, duration: 0.8 }}
-                >
-                  Beyond entertainment, the Uma Musume community is known for being exceptionally generous and respectful toward real horses. Fans actively support retired racehorses through donations, farm visits, and welfare initiatives, helping give these champions a better life after racing.
-                </motion.p>
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.8, duration: 0.8 }}
-                >
-                  This year is about more than racing, it&apos;s about giving back.<br />
-                  <strong>Let&apos;s save the horses in their year.</strong>
-                </motion.p>
+                {t.about.paragraphs ? (
+                  <>
+                    <motion.p
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.4, duration: 0.8 }}
+                    >
+                      {t.about.paragraphs[0]?.includes('Uma Musume: Pretty Derby') ? (
+                        <>
+                          <strong>Uma Musume: Pretty Derby</strong> {t.about.paragraphs[0].replace(/^.*?Pretty Derby\s+/i, '')}
+                        </>
+                      ) : (
+                        t.about.paragraphs[0]
+                      )}
+                    </motion.p>
+                    <motion.p
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.6, duration: 0.8 }}
+                    >
+                      {t.about.paragraphs[1]}
+                    </motion.p>
+                    <motion.p
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.8, duration: 0.8 }}
+                    >
+                      {t.about.paragraphs[2]?.includes('Let\'s save') ? (
+                        <>
+                          {t.about.paragraphs[2].replace(/Let's save the horses in their year\.?$/, '').trim()}
+                          <br />
+                          <strong>Let&apos;s save the horses in their year.</strong>
+                        </>
+                      ) : t.about.paragraphs[2]?.includes('让我们') || t.about.paragraphs[2]?.includes('拯救') ? (
+                        <>
+                          {t.about.paragraphs[2].replace(/(让我们在它们的年份拯救马匹|让我们在它们的年份拯救马匹。)$/, '').trim()}
+                          <br />
+                          <strong>让我们在它们的年份拯救马匹。</strong>
+                        </>
+                      ) : t.about.paragraphs[2]?.includes('救いましょう') ? (
+                        <>
+                          {t.about.paragraphs[2].replace(/彼らの年に馬を救いましょう。?$/, '').trim()}
+                          <br />
+                          <strong>彼らの年に馬を救いましょう。</strong>
+                        </>
+                      ) : (
+                        t.about.paragraphs[2]
+                      )}
+                    </motion.p>
+                  </>
+                ) : (
+                  <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.4, duration: 0.8 }}
+                  >
+                    {t.about.description}
+                  </motion.p>
+                )}
               </div>
             </motion.div>
           </div>

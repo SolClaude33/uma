@@ -1,8 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import { useLanguage } from "@/lib/LanguageContext";
 
 export default function Footer() {
+  const { t } = useLanguage();
   return (
     <footer className="relative py-3 min-h-[10vh] overflow-hidden" style={{ backgroundColor: '#e5e5e5' }}>
       {/* Content */}
@@ -18,7 +20,7 @@ export default function Footer() {
             />
           </div>
           <p className="text-gray-700 text-xs">
-            © {new Date().getFullYear()} Save a uma. All rights reserved.
+            © {new Date().getFullYear()} {t.footer.copyright}. All rights reserved.
           </p>
         </div>
       </div>

@@ -4,15 +4,25 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiMenu, HiX } from "react-icons/hi";
 import { FaXTwitter } from "react-icons/fa6";
+import { IoMdGlobe } from "react-icons/io";
 import Image from "next/image";
+import { useLanguage } from "@/lib/LanguageContext";
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
+  const { language, setLanguage, t } = useLanguage();
 
   const navLinks = [
-    { label: "About", href: "#about" },
-    { label: "Dashboard", href: "#dashboard" },
-    { label: "How is working", href: "#how-is-working" },
+    { label: t.nav.about, href: "#about" },
+    { label: t.nav.dashboard, href: "#dashboard" },
+    { label: t.nav.howIsWorking, href: "#how-is-working" },
+  ];
+
+  const languages = [
+    { code: 'en' as const, label: 'English', flag: '🇺🇸' },
+    { code: 'zh' as const, label: '中文', flag: '🇨🇳' },
+    { code: 'ja' as const, label: '日本語', flag: '🇯🇵' },
   ];
 
   const scrollTo = (href: string) => {
@@ -66,7 +76,7 @@ export default function Navigation() {
               </button>
             ))}
             <a
-              href="https://twitter.com"
+              href="https://x.com/SaveaUma"
               target="_blank"
               rel="noopener noreferrer"
               className="text-white hover:text-pink-400 transition-colors"
@@ -74,6 +84,53 @@ export default function Navigation() {
             >
               <FaXTwitter className="text-2xl" style={{ filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.8))' }} />
             </a>
+            
+            {/* Language Selector */}
+            <div className="relative">
+              <button
+                onClick={() => setShowLanguageMenu(!showLanguageMenu)}
+                className="text-white hover:text-pink-400 transition-colors flex items-center gap-2 font-bold"
+                style={{ 
+                  fontFamily: 'Arial, sans-serif',
+                  textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8), -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000',
+                  letterSpacing: '0.05em'
+                }}
+                aria-label="Select language"
+              >
+                <IoMdGlobe className="text-2xl" style={{ filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.8))' }} />
+              </button>
+              
+              <AnimatePresence>
+                {showLanguageMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute right-0 mt-2 bg-white/95 backdrop-blur-md rounded-lg shadow-lg overflow-hidden"
+                    style={{ minWidth: '150px' }}
+                  >
+                    {languages.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => {
+                          setLanguage(lang.code);
+                          setShowLanguageMenu(false);
+                        }}
+                        className={`w-full text-left px-4 py-2 hover:bg-pink-100 transition-colors flex items-center gap-2 ${
+                          language === lang.code ? 'bg-pink-200 font-bold' : ''
+                        }`}
+                        style={{ fontFamily: 'Arial, sans-serif' }}
+                      >
+                        <span>{lang.flag}</span>
+                        <span style={{ color: language === lang.code ? 'rgb(255, 121, 208)' : '#4a4a4a' }}>
+                          {lang.label}
+                        </span>
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -112,7 +169,7 @@ export default function Navigation() {
                 </button>
               ))}
               <a
-                href="https://twitter.com"
+                href="https://x.com/SaveaUma"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center text-white hover:text-pink-400 transition-colors py-2"
@@ -125,6 +182,35 @@ export default function Navigation() {
                   letterSpacing: '0.05em'
                 }}>X (Twitter)</span>
               </a>
+              
+              {/* Language Selector Mobile */}
+              <div className="space-y-2">
+                <p className="text-white font-bold py-2" style={{ 
+                  fontFamily: 'Arial, sans-serif',
+                  textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)',
+                  letterSpacing: '0.05em'
+                }}>
+                  Language:
+                </p>
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => {
+                      setLanguage(lang.code);
+                      setIsOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                      language === lang.code 
+                        ? 'bg-pink-400 text-white font-bold' 
+                        : 'bg-white/10 text-white hover:bg-white/20'
+                    }`}
+                    style={{ fontFamily: 'Arial, sans-serif' }}
+                  >
+                    <span>{lang.flag}</span>
+                    <span>{lang.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </motion.div>
         )}

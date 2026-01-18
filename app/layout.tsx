@@ -1,15 +1,21 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { LanguageProvider } from "@/lib/LanguageContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "UMAX | Race. Shine. Moon.",
-  description: "A high-energy racing-idol memecoin on Solana. Join the academy of racers and shine on the track!",
+  title: "Save a Uma",
+  description: "Let's run to save the horses!",
+  icons: {
+    icon: '/Uma_Musume_Pretty_Derby_JP_Logo.webp',
+    shortcut: '/Uma_Musume_Pretty_Derby_JP_Logo.webp',
+    apple: '/Uma_Musume_Pretty_Derby_JP_Logo.webp',
+  },
   openGraph: {
-    title: "UMAX | Race. Shine. Moon.",
-    description: "A high-energy racing-idol memecoin on Solana.",
+    title: "Save a Uma",
+    description: "Let's run to save the horses!",
     type: "website",
   },
 };
@@ -21,7 +27,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <LanguageProvider>{children}</LanguageProvider>
+      </body>
     </html>
   );
 }

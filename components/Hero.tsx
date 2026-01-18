@@ -3,8 +3,10 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useState } from "react";
+import { useLanguage } from "@/lib/LanguageContext";
 
 export default function Hero() {
+  const { t } = useLanguage();
   const [showConfetti, setShowConfetti] = useState(false);
 
   const handleBuyClick = () => {
@@ -103,7 +105,7 @@ export default function Hero() {
                 letterSpacing: '0.05em'
               }}
             >
-              Let&apos;s run to save the horses!
+              {t.hero.slogan}
             </motion.p>
 
             <motion.div
@@ -120,7 +122,7 @@ export default function Hero() {
                   boxShadow: '0 10px 30px rgba(255, 121, 208, 0.5)'
                 }}
               >
-                <span className="relative z-10">Buy on Flap</span>
+                <span className="relative z-10">{t.hero.buyOnFlap}</span>
                 {showConfetti && (
                   <motion.div
                     initial={{ opacity: 0 }}
@@ -161,7 +163,7 @@ export default function Hero() {
                   boxShadow: '0 10px 30px rgba(255, 121, 208, 0.5)'
                 }}
               >
-                Learn More
+                {t.hero.learnMore}
               </button>
             </motion.div>
 
