@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createPublicClient, http, formatEther, PublicClient } from "viem";
+import { createPublicClient, http, formatEther, PublicClient, decodeEventLog } from "viem";
 import { bsc } from "viem/chains";
 import { FLAP_PORTAL_ADDRESS, FLAP_PORTAL_ABI, TOKEN_ADDRESS } from "./flapContract";
 
@@ -115,7 +115,7 @@ export function useContractData(): DashboardData {
             
             try {
               // Intentar decodificar como TokenBought o TokenSold
-              const decodedLog = publicClient.decodeEventLog({
+              const decodedLog = decodeEventLog({
                 abi: FLAP_PORTAL_ABI,
                 data: log.data,
                 topics: log.topics,
