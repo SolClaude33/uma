@@ -209,3 +209,52 @@
     clip-path: inset(0 0 0 0);
   }
 }
+
+/* Music Player Volume Slider */
+.music-volume-slider {
+  width: 80px;
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.music-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s;
+}
+
+.music-volume-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.music-volume-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s;
+}
+
+.music-volume-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+}
+
+.music-volume-slider::-moz-range-track {
+  background: rgba(255, 255, 255, 0.3);
+  height: 6px;
+  border-radius: 3px;
+}

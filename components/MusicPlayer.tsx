@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { FaVolumeUp, FaVolumeDown, FaPause, FaPlay } from "react-icons/fa";
+import { FaPause, FaPlay, FaVolumeUp } from "react-icons/fa";
 
 export default function MusicPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -58,8 +58,8 @@ export default function MusicPlayer() {
     }
   };
 
-  const decreaseVolume = () => {
-    const newVolume = Math.max(0, volume - 0.1);
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value);
     setVolume(newVolume);
     if (audioRef.current) {
       audioRef.current.volume = newVolume;
@@ -68,36 +68,40 @@ export default function MusicPlayer() {
 
   return (
     <div
-      className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-black/80 backdrop-blur-md rounded-full px-4 py-3 shadow-lg border border-white/20"
+      className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-full px-4 py-3 shadow-lg"
       style={{
         fontFamily: 'Arial, sans-serif',
+        background: 'rgb(255, 121, 208)',
+        border: '2px solid rgba(255, 255, 255, 0.3)',
+        boxShadow: '0 10px 30px rgba(255, 121, 208, 0.5)'
       }}
     >
       {/* Botón Play/Pause */}
       <button
         onClick={togglePlayPause}
-        className="text-white hover:text-pink-400 transition-colors flex items-center justify-center w-8 h-8"
+        className="text-white hover:text-white/80 transition-colors flex items-center justify-center w-8 h-8"
         aria-label={isPlaying ? "Pausar música" : "Reproducir música"}
       >
         {isPlaying ? <FaPause className="text-xl" /> : <FaPlay className="text-xl" />}
       </button>
 
-      {/* Indicador de volumen */}
+      {/* Icono de volumen y slider */}
       <div className="flex items-center gap-2">
-        <FaVolumeUp className="text-white text-sm" style={{ opacity: 0.8 }} />
-        <span className="text-white text-xs" style={{ minWidth: '30px', textAlign: 'right' }}>
+        <FaVolumeUp className="text-white text-sm" style={{ opacity: 0.9 }} />
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={volume}
+          onChange={handleVolumeChange}
+          className="music-volume-slider"
+          aria-label="Control de volumen"
+        />
+        <span className="text-white text-xs font-bold" style={{ minWidth: '35px', textAlign: 'right' }}>
           {Math.round(volume * 100)}%
         </span>
       </div>
-
-      {/* Botón para bajar volumen */}
-      <button
-        onClick={decreaseVolume}
-        className="text-white hover:text-pink-400 transition-colors flex items-center justify-center w-8 h-8"
-        aria-label="Bajar volumen"
-      >
-        <FaVolumeDown className="text-lg" />
-      </button>
     </div>
   );
 }
