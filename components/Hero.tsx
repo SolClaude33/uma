@@ -28,7 +28,7 @@ export default function Hero() {
       <div className="absolute inset-0 z-0">
         <Image
           src="/main2.avif"
-          alt="UMAX Racing Academy"
+          alt="Uma Musume Racing Academy"
           fill
           className="object-cover"
           priority

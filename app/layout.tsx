@@ -18,6 +18,15 @@ export const metadata: Metadata = {
     description: "Let's run to save the horses!",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Save a Uma",
+    description: "Let's run to save the horses!",
+  },
+  keywords: ["Uma Musume", "horses", "charity", "BNB", "BSC", "BEP-20", "token"],
+  authors: [{ name: "Save a Uma" }],
+  creator: "Save a Uma",
+  publisher: "Save a Uma",
 };
 
 export default function RootLayout({

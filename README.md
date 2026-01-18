@@ -1,6 +1,6 @@
-# UMAX Landing Page
+# Save a Uma Landing Page
 
-A high-energy racing-idol memecoin landing page built with Next.js 14, TypeScript, and Tailwind CSS.
+A charitable token project on BSC (BNB Chain) that supports real horse welfare initiatives, built with Next.js 14, TypeScript, and Tailwind CSS.
 
 ## 🚀 Getting Started
 
