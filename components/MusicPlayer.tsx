@@ -23,7 +23,7 @@ export default function MusicPlayer() {
           setIsPlaying(true);
         })
         .catch((error) => {
-          console.log("Autoplay bloqueado por el navegador:", error);
+              console.log("Autoplay blocked by browser:", error);
           // El usuario deberá hacer clic para reproducir
         });
     }

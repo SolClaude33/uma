@@ -43,18 +43,18 @@ export function useContractData(): DashboardData {
         // Leer el estado del token desde el contrato Portal de Flap usando getTokenV7
         if (!FLAP_PORTAL_ADDRESS || FLAP_PORTAL_ADDRESS === "0x0000000000000000000000000000000000000000" ||
             !TOKEN_ADDRESS || TOKEN_ADDRESS === "0x0000000000000000000000000000000000000000") {
-          console.warn("⚠️ Dashboard - Direcciones de contrato no configuradas");
+          console.warn("⚠️ Dashboard - Contract addresses not configured");
           setData({
             totalFeesCollected: "0.00",
             liquidityAdded: "0.00",
             horsesHelped: "-",
             isLoading: false,
-            error: "Direcciones de contrato no configuradas. Verifica NEXT_PUBLIC_CONTRACT_ADDRESS en Vercel.",
+            error: "Contract addresses not configured. Check NEXT_PUBLIC_CONTRACT_ADDRESS in Vercel.",
           });
           return;
         }
 
-        console.log("📡 Dashboard - Leyendo datos del contrato Flap...");
+        console.log("📡 Dashboard - Reading Flap contract data...");
         
         // Leer estado del token
         const tokenState = await publicClient.readContract({
@@ -80,14 +80,14 @@ export function useContractData(): DashboardData {
           }) as string;
           
           if (taxProcessorAddress && taxProcessorAddress !== "0x0000000000000000000000000000000000000000") {
-            console.log(`🔗 Dashboard - TaxProcessor obtenido desde token: ${taxProcessorAddress}`);
+            console.log(`🔗 Dashboard - TaxProcessor obtained from token: ${taxProcessorAddress}`);
           } else {
-            console.log("⚠️ Dashboard - Token no tiene taxProcessor configurado");
+            console.log("⚠️ Dashboard - Token does not have taxProcessor configured");
             // Usar dirección de variable de entorno como fallback
             taxProcessorAddress = TAX_PROCESSOR_ADDRESS;
           }
         } catch (tokenError) {
-          console.warn("⚠️ Dashboard - No se pudo leer taxProcessor desde token:", tokenError);
+          console.warn("⚠️ Dashboard - Could not read taxProcessor from token:", tokenError);
           // Usar dirección de variable de entorno como fallback
           taxProcessorAddress = TAX_PROCESSOR_ADDRESS;
         }
@@ -95,7 +95,7 @@ export function useContractData(): DashboardData {
         // INTENTAR LEER DESDE CONTRATO TAX_PROCESSOR (más eficiente y preciso)
         if (taxProcessorAddress && taxProcessorAddress !== "0x0000000000000000000000000000000000000000") {
           try {
-            console.log("💰 Dashboard - Intentando leer desde contrato TaxProcessor...");
+            console.log("💰 Dashboard - Attempting to read from TaxProcessor contract...");
             
             // Leer todos los totales acumulados del TaxProcessor
             const [totalLiquidityAdded, totalMarketingSent, pendingLiquidity, pendingMarketing] = await Promise.all([
@@ -127,11 +127,11 @@ export function useContractData(): DashboardData {
             const totalMarketingAll = totalMarketingSent + pendingMarketing;
             const totalLiquidityAll = totalLiquidityAdded + pendingLiquidity;
 
-            console.log(`✅ Dashboard - Total desde TaxProcessor:`);
-            console.log(`   - Marketing (distribuido): ${formatEther(totalMarketingSent)} BNB`);
-            console.log(`   - Marketing (pendiente): ${formatEther(pendingMarketing)} BNB`);
-            console.log(`   - Liquidity (distribuido): ${formatEther(totalLiquidityAdded)} BNB`);
-            console.log(`   - Liquidity (pendiente): ${formatEther(pendingLiquidity)} BNB`);
+            console.log(`✅ Dashboard - Total from TaxProcessor:`);
+            console.log(`   - Marketing (distributed): ${formatEther(totalMarketingSent)} BNB`);
+            console.log(`   - Marketing (pending): ${formatEther(pendingMarketing)} BNB`);
+            console.log(`   - Liquidity (distributed): ${formatEther(totalLiquidityAdded)} BNB`);
+            console.log(`   - Liquidity (pending): ${formatEther(pendingLiquidity)} BNB`);
             console.log(`   - Total Marketing (Donations): ${formatEther(totalMarketingAll)} BNB`);
             console.log(`   - Total Liquidity: ${formatEther(totalLiquidityAll)} BNB`);
 
@@ -156,7 +156,7 @@ export function useContractData(): DashboardData {
 
             return; // Salir temprano si se leyó exitosamente desde TaxProcessor
           } catch (taxProcessorError) {
-            console.warn("⚠️ Dashboard - No se pudo leer desde TaxProcessor, intentando Dividend:", taxProcessorError);
+            console.warn("⚠️ Dashboard - Could not read from TaxProcessor, trying Dividend:", taxProcessorError);
             // Intentar Dividend como fallback
           }
         }
@@ -164,14 +164,14 @@ export function useContractData(): DashboardData {
         // INTENTAR LEER DESDE CONTRATO DIVIDEND (fallback)
         if (DIVIDEND_ADDRESS && DIVIDEND_ADDRESS !== "0x0000000000000000000000000000000000000000") {
           try {
-            console.log("💰 Dashboard - Intentando leer desde contrato Dividend...");
+            console.log("💰 Dashboard - Attempting to read from Dividend contract...");
             const totalDividendsDistributed = await publicClient.readContract({
               address: DIVIDEND_ADDRESS as `0x${string}`,
               abi: DIVIDEND_ABI,
               functionName: "totalDividendsDistributed",
             }) as bigint;
 
-            console.log(`✅ Dashboard - Total dividendos desde contrato Dividend: ${formatEther(totalDividendsDistributed)} BNB`);
+            console.log(`✅ Dashboard - Total dividends from Dividend contract: ${formatEther(totalDividendsDistributed)} BNB`);
 
             // Distribución 70/30
             const totalFeesForHorses = (totalDividendsDistributed * 70n) / 100n;
@@ -197,13 +197,13 @@ export function useContractData(): DashboardData {
 
             return; // Salir temprano si se leyó exitosamente desde Dividend
           } catch (dividendError) {
-            console.warn("⚠️ Dashboard - No se pudo leer desde Dividend, usando eventos:", dividendError);
+            console.warn("⚠️ Dashboard - Could not read from Dividend, using events:", dividendError);
             // Continuar con lectura de eventos como fallback
           }
         }
 
         // Leer eventos históricos para calcular fees acumuladas (fallback)
-        console.log("📜 Dashboard - Leyendo eventos históricos para calcular fees...");
+        console.log("📜 Dashboard - Reading historical events to calculate fees...");
         
         // Obtener el bloque actual
         const currentBlock = await publicClient.getBlockNumber();
@@ -219,7 +219,7 @@ export function useContractData(): DashboardData {
         // Necesitamos dividir la lectura en lotes de máximo 1000 bloques
         const maxBlocksPerRequest = 1000n;
         
-        console.log(`📊 Dashboard - Buscando eventos desde bloque ${startBlock.toString()} hasta ${currentBlock.toString()}`);
+        console.log(`📊 Dashboard - Searching events from block ${startBlock.toString()} to ${currentBlock.toString()}`);
         
         try {
           // Filtrar logs por topic[1] que contiene el token address (primer parámetro indexado)
@@ -230,7 +230,7 @@ export function useContractData(): DashboardData {
           const allLogs: any[] = [];
           let fromBlock = startBlock;
           
-          console.log(`📦 Dashboard - Leyendo eventos en lotes de ${maxBlocksPerRequest.toString()} bloques...`);
+          console.log(`📦 Dashboard - Reading events in batches of ${maxBlocksPerRequest.toString()} blocks...`);
           
           while (fromBlock < currentBlock) {
             const toBlock = fromBlock + maxBlocksPerRequest > currentBlock 
@@ -246,20 +246,20 @@ export function useContractData(): DashboardData {
               
               allLogs.push(...batchLogs);
               
-              console.log(`   ✓ Bloque ${fromBlock.toString()} - ${toBlock.toString()}: ${batchLogs.length} logs encontrados`);
+              console.log(`   ✓ Block ${fromBlock.toString()} - ${toBlock.toString()}: ${batchLogs.length} logs found`);
               
               fromBlock = toBlock + 1n;
               
               // Pequeña pausa entre lotes para evitar rate limiting
               await new Promise(resolve => setTimeout(resolve, 100));
             } catch (batchError) {
-              console.error(`⚠️ Error en lote ${fromBlock.toString()}-${toBlock.toString()}:`, batchError);
+              console.error(`⚠️ Error in batch ${fromBlock.toString()}-${toBlock.toString()}:`, batchError);
               // Continuar con el siguiente lote
               fromBlock = toBlock + 1n;
             }
           }
           
-          console.log(`📊 Dashboard - Total logs encontrados: ${allLogs.length}`);
+          console.log(`📊 Dashboard - Total logs found: ${allLogs.length}`);
           
           // Filtrar y decodificar eventos TokenBought y TokenSold
           let totalFeesFromBought = 0n;
@@ -306,15 +306,15 @@ export function useContractData(): DashboardData {
             }
           }
           
-          console.log(`📈 Dashboard - Eventos procesados: ${boughtCount} compras, ${soldCount} ventas`);
+          console.log(`📈 Dashboard - Events processed: ${boughtCount} purchases, ${soldCount} sales`);
           
           // Total de fees acumuladas (3% de todas las transacciones)
           const totalFeesCollected = totalFeesFromBought + totalFeesFromSold;
           
-          console.log(`💰 Dashboard - Fees calculadas desde eventos:`);
-          console.log(`   - Fees de compras: ${formatEther(totalFeesFromBought)} BNB`);
-          console.log(`   - Fees de ventas: ${formatEther(totalFeesFromSold)} BNB`);
-          console.log(`   - Total fees acumuladas (3%): ${formatEther(totalFeesCollected)} BNB`);
+          console.log(`💰 Dashboard - Fees calculated from events:`);
+          console.log(`   - Purchase fees: ${formatEther(totalFeesFromBought)} BNB`);
+          console.log(`   - Sale fees: ${formatEther(totalFeesFromSold)} BNB`);
+          console.log(`   - Total accumulated fees (3%): ${formatEther(totalFeesCollected)} BNB`);
           
           // Distribución de las fees:
           // - 70% va a "Total Fees" (fees destinadas a ayudar caballos)
@@ -322,9 +322,9 @@ export function useContractData(): DashboardData {
           const totalFeesForHorses = (totalFeesCollected * 70n) / 100n; // 70% para caballos
           const totalFeesForLiquidity = (totalFeesCollected * 30n) / 100n; // 30% para liquidez
           
-          console.log(`📊 Dashboard - Distribución de fees:`);
-          console.log(`   - 70% para caballos (Total Fees): ${formatEther(totalFeesForHorses)} BNB`);
-          console.log(`   - 30% para liquidez (Liquidity): ${formatEther(totalFeesForLiquidity)} BNB`);
+          console.log(`📊 Dashboard - Fee distribution:`);
+          console.log(`   - 70% for horses (Total Fees): ${formatEther(totalFeesForHorses)} BNB`);
+          console.log(`   - 30% for liquidity (Liquidity): ${formatEther(totalFeesForLiquidity)} BNB`);
           
           // Convertir de Wei a BNB
           const feesInBNB = formatEther(totalFeesForHorses);
@@ -346,7 +346,7 @@ export function useContractData(): DashboardData {
             error: null,
           });
         } catch (eventsError) {
-          console.error("⚠️ Dashboard - Error leyendo eventos históricos:", eventsError);
+          console.error("⚠️ Dashboard - Error reading historical events:", eventsError);
           
           // Si falla la lectura de eventos, usar estimación basada en reserve
           // Pero aplicar la distribución 70/30 también
@@ -369,11 +369,11 @@ export function useContractData(): DashboardData {
             liquidityAdded: formattedLiquidity,
             horsesHelped: horsesHelpedStr,
             isLoading: false,
-            error: `Error leyendo eventos: ${eventsError instanceof Error ? eventsError.message : "Error desconocido"}. Mostrando estimación.`,
+            error: `Error reading events: ${eventsError instanceof Error ? eventsError.message : "Unknown error"}. Showing estimate.`,
           });
         }
       } catch (error) {
-        console.error("❌ Dashboard - Error leyendo datos del contrato Flap:", error);
+        console.error("❌ Dashboard - Error reading Flap contract data:", error);
         
         // Log detallado del error
         if (error instanceof Error) {
@@ -386,7 +386,7 @@ export function useContractData(): DashboardData {
           liquidityAdded: "0.00",
           horsesHelped: "-",
           isLoading: false,
-          error: error instanceof Error ? `Error: ${error.message}` : "Error desconocido al leer del contrato",
+          error: error instanceof Error ? `Error: ${error.message}` : "Unknown error reading contract",
         });
       }
     }
